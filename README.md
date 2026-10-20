@@ -1,6 +1,6 @@
 # &lt;code-editor&gt;
 
-A code editor web component that works like a `<textarea>` in forms. It's built on [CodeMirror 6](https://codemirror.net/) and ships as **one JavaScript file** with no other dependencies, so it works on any page: plain HTML, ColdFusion, jQuery.
+A code editor web component that works like a `<textarea>` in forms. It's built on [CodeMirror 6](https://codemirror.net/) and ships as **one JavaScript file** with no other dependencies, so it works on any page: plain HTML.
 
 ```html
 <form action="/orders" method="post">
@@ -90,7 +90,8 @@ Run `pnpm build` and copy `dist/code-editor.js` to the web server, for example t
 <script type="module" src="/common/code-editor.js"></script>
 ```
 
-- `type="module"` is recommended. The browser downloads and runs the file **once per page**, even if the tag appears many times. That makes it safe for a ColdFusion custom tag that writes this `<script>` next to every editor.
+- `type="module"` is recommended. The browser downloads and runs the file **once per page**, even if the tag appears many times.
+
 - A classic `<script src="/common/code-editor.js" defer></script>` also works, even without `defer` and even inside `<head>`.
 - Including the file twice never causes an error.
 
@@ -157,7 +158,7 @@ There's one browser limitation. The browser reads everything between `<code-edit
   ```
 
   A `<textarea>` wrapper works too, but it decodes entities such as `&lt;`.
-- Escaping `<` as `&lt;` and `&` as `&amp;` also works. Server-side code can do this for you, for example ColdFusion's `EncodeForHTML()`.
+- Escaping `<` as `&lt;` and `&` as `&amp;` also works.
 
 If markup slips through unwrapped, the editor still shows its best reconstruction and logs a warning in the browser console.
 
@@ -171,7 +172,7 @@ The editor submits its text through a hidden `<textarea>` that it keeps inside i
 
 Details:
 
-- **Line breaks arrive as `\r\n`.** Browsers send every multi-line form field that way, so ColdFusion and other servers receive `\r\n` in `FORM.payload`. Tabs are sent as typed.
+- **Line breaks arrive as `\r\n`.** Browsers send every multi-line form field that way, so servers receive `\r\n` in `FORM.payload`. Tabs are sent as typed.
 - **Reset** (`<button type="reset">` or `form.reset()`) restores the code the page loaded with.
 - **Events:** `input` fires on every edit and `change` fires on blur after the text changed, as with a `<textarea>`. They bubble, so `$(form).on('change', 'code-editor', …)` works.
 - `form.elements.payload` returns two elements: the editor and its hidden `<textarea>`. Read the value from the editor itself (see below).
