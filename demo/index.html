@@ -1,0 +1,1317 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>&lt;code-editor&gt; guide</title>
+	<style>
+		/* Optional for real pages: avoids a flash of unstyled code before the script loads. */
+		code-editor:not(:defined) {
+			display: block;
+			white-space: pre;
+			font-family: monospace;
+			overflow: auto;
+			opacity: 0.5;
+		}
+
+		:root {
+			color-scheme: light dark;
+			--page-bg: #ffffff;
+			--page-fg: #1f2328;
+			--page-muted: #59636e;
+			--page-border: #d0d7de;
+			--page-panel: #f6f8fa;
+			--page-accent: #0969da;
+			--page-good: #1a7f37;
+			--page-bad: #cf222e;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--page-bg: #0d1117;
+				--page-fg: #e6edf3;
+				--page-muted: #9198a1;
+				--page-border: #30363d;
+				--page-panel: #161b22;
+				--page-accent: #4493f8;
+				--page-good: #3fb950;
+				--page-bad: #f85149;
+			}
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-padding-top: 16px;
+		}
+
+		body {
+			margin: 0;
+			background: var(--page-bg);
+			color: var(--page-fg);
+			font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+		}
+
+		.layout {
+			display: grid;
+			grid-template-columns: 200px minmax(0, 1fr);
+			gap: 48px;
+			max-width: 1160px;
+			margin: 0 auto;
+			padding: 32px 24px 80px;
+		}
+
+		nav {
+			position: sticky;
+			top: 24px;
+			align-self: start;
+			font-size: 14px;
+		}
+
+		nav ol {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		nav a {
+			display: block;
+			padding: 4px 10px;
+			border-radius: 6px;
+			color: var(--page-muted);
+			text-decoration: none;
+		}
+
+		nav a:hover {
+			background: var(--page-panel);
+			color: var(--page-fg);
+		}
+
+		nav .nav-title {
+			font-weight: 600;
+			margin: 0 0 8px 10px;
+		}
+
+		@media (max-width: 900px) {
+			.layout {
+				grid-template-columns: minmax(0, 1fr);
+				gap: 16px;
+				padding: 24px 16px 64px;
+			}
+
+			nav {
+				position: static;
+			}
+
+			nav ol {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+			}
+
+			nav a {
+				border: 1px solid var(--page-border);
+			}
+		}
+
+		h1 {
+			font-size: 32px;
+			margin: 0 0 8px;
+		}
+
+		h2 {
+			font-size: 22px;
+			margin: 56px 0 12px;
+			padding-top: 24px;
+			border-top: 1px solid var(--page-border);
+		}
+
+		h3 {
+			font-size: 17px;
+			margin: 32px 0 8px;
+		}
+
+		p {
+			margin: 0 0 12px;
+		}
+
+		.lead {
+			font-size: 17px;
+			color: var(--page-muted);
+			max-width: 70ch;
+		}
+
+		code {
+			font: 0.9em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			padding: 0.1em 0.35em;
+			border-radius: 4px;
+			background: var(--page-panel);
+		}
+
+		kbd {
+			font: 12px ui-monospace, monospace;
+			padding: 1px 5px;
+			border: 1px solid var(--page-border);
+			border-bottom-width: 2px;
+			border-radius: 4px;
+			background: var(--page-panel);
+			white-space: nowrap;
+		}
+
+		a {
+			color: var(--page-accent);
+		}
+
+		.table-wrap {
+			overflow-x: auto;
+			margin: 12px 0 16px;
+		}
+
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 14px;
+		}
+
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--page-border);
+			vertical-align: top;
+		}
+
+		th {
+			font-weight: 600;
+			background: var(--page-panel);
+		}
+
+		td:first-child {
+			white-space: nowrap;
+		}
+
+		.note {
+			margin: 16px 0;
+			padding: 12px 16px;
+			border-left: 3px solid var(--page-accent);
+			background: var(--page-panel);
+			border-radius: 0 6px 6px 0;
+		}
+
+		.note.warn {
+			border-left-color: var(--page-bad);
+		}
+
+		.note p:last-child {
+			margin: 0;
+		}
+
+		.steps {
+			padding-left: 20px;
+		}
+
+		.steps li {
+			margin-bottom: 8px;
+		}
+
+		/* An example: its markup on top, the live result below. */
+		.example {
+			margin: 16px 0 24px;
+			border: 1px solid var(--page-border);
+			border-radius: 8px;
+			overflow: hidden;
+		}
+
+		.example.bad {
+			border-color: var(--page-bad);
+		}
+
+		.example.good {
+			border-color: var(--page-good);
+		}
+
+		.pane-label {
+			padding: 6px 12px;
+			font-size: 13px;
+			font-weight: 600;
+			color: var(--page-muted);
+			background: var(--page-panel);
+			border-bottom: 1px solid var(--page-border);
+		}
+
+		.pane-result {
+			border-top: 1px solid var(--page-border);
+		}
+
+		.pane-result>.example-result {
+			padding: 16px;
+		}
+
+		.example code-editor.example-code {
+			border: 0;
+			border-radius: 0;
+			box-shadow: none;
+		}
+
+		.example-result label,
+		.example-result legend,
+		.playground label.field {
+			display: block;
+			font-weight: 600;
+			margin: 14px 0 6px;
+		}
+
+		.example-result label:first-child {
+			margin-top: 0;
+		}
+
+		.example-result fieldset {
+			border: 1px solid var(--page-border);
+			border-radius: 6px;
+			padding: 0 14px 14px;
+			margin-top: 14px;
+		}
+
+		.example-result code-editor+code-editor {
+			margin-top: 12px;
+		}
+
+		.row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 14px;
+			align-items: center;
+		}
+
+		button,
+		select {
+			font: inherit;
+			font-size: 14px;
+			padding: 5px 12px;
+			border-radius: 6px;
+			border: 1px solid var(--page-border);
+			background: var(--page-panel);
+			color: var(--page-fg);
+			cursor: pointer;
+		}
+
+		button[type="submit"] {
+			background: #1f883d;
+			border-color: #1f883d;
+			color: #fff;
+		}
+
+		button code {
+			background: none;
+			padding: 0;
+		}
+
+		.check {
+			display: inline-flex;
+			gap: 6px;
+			align-items: center;
+		}
+
+		pre.output {
+			margin: 12px 0 0;
+			padding: 12px;
+			min-height: 3em;
+			max-height: 320px;
+			overflow: auto;
+			white-space: pre-wrap;
+			word-break: break-all;
+			font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			background: var(--page-panel);
+			border: 1px solid var(--page-border);
+			border-radius: 6px;
+		}
+
+		.playground {
+			margin: 16px 0 24px;
+			padding: 16px;
+			border: 1px solid var(--page-border);
+			border-radius: 8px;
+		}
+
+		.playground .row:first-child {
+			margin-top: 0;
+			margin-bottom: 12px;
+		}
+
+		.theme-row {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px;
+			align-items: start;
+		}
+
+		.theme-row>:first-child {
+			grid-column: 1 / -1;
+		}
+
+		@media (max-width: 700px) {
+			.theme-row {
+				grid-template-columns: minmax(0, 1fr);
+			}
+		}
+
+		.muted {
+			color: var(--page-muted);
+		}
+	</style>
+	<script src="../dist/code-editor.js" defer></script>
+	<!-- jQuery is only here to show that the editor works with it. -->
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+</head>
+
+<body>
+	<div class="layout">
+		<nav aria-label="Sections">
+			<p class="nav-title">&lt;code-editor&gt;</p>
+			<ol>
+				<li><a href="#start">Getting started</a></li>
+				<li><a href="#attributes">Attributes</a></li>
+				<li><a href="#content">Putting code in</a></li>
+				<li><a href="#languages">Languages</a></li>
+				<li><a href="#themes">Themes and colors</a></li>
+				<li><a href="#size">Size</a></li>
+				<li><a href="#editing">Editing and keyboard</a></li>
+				<li><a href="#readonly">Read-only and disabled</a></li>
+				<li><a href="#forms">Forms</a></li>
+				<li><a href="#minify">minify</a></li>
+				<li><a href="#javascript">JavaScript and jQuery</a></li>
+				<li><a href="#accessibility">Accessibility</a></li>
+				<li><a href="#troubleshooting">Troubleshooting</a></li>
+			</ol>
+		</nav>
+
+		<main>
+			<h1>&lt;code-editor&gt;</h1>
+			<p class="lead">A code editor for web pages. It edits code the way an IDE does, sends its code with a form
+				just like a <code>&lt;textarea&gt;</code>, and shows read-only code samples in documentation. Everything on
+				this page is live: click into any example and try it.</p>
+
+			<!-- ================================================================== -->
+			<h2 id="start">Getting started</h2>
+			<ol class="steps">
+				<li><strong>Load the script</strong> once on the page. It can go anywhere, and if the tag ends up on the
+					page more than once (one per editor, for example), the browser still loads the file only once.</li>
+				<li><strong>Add a <code>&lt;code-editor&gt;</code></strong> and put the code between its tags.</li>
+			</ol>
+
+			<div class="example" data-only="code" data-label="Load the script">
+				<textarea class="source" hidden>
+					<script type="module" src="/common/code-editor.js"></script>
+				</textarea>
+			</div>
+
+			<div class="example">
+				<textarea class="source" hidden>
+					<code-editor language="json">
+						{
+							"customer": "Ada Lovelace",
+							"items": 2,
+							"gift": true
+						}
+					</code-editor>
+				</textarea>
+			</div>
+
+			<p>That's all it takes. The editor highlights the code, removes the indentation that came from the
+				surrounding HTML, and is ready to edit. Inside a form it's sent like any other field once you give it a
+				<code>name</code>; see <a href="#forms">Forms</a>.</p>
+
+			<p>Optional: until the script loads, the browser shows the code as plain text for a moment. This CSS makes
+				that moment look tidier:</p>
+			<div class="example" data-only="code" data-label="CSS" data-language="css">
+				<textarea class="source" hidden>
+					code-editor:not(:defined) {
+						display: block;
+						white-space: pre;
+						font-family: monospace;
+						overflow: auto;
+					}
+				</textarea>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="attributes">Attributes</h2>
+			<p>All attributes are optional.</p>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Attribute</th>
+							<th>Values</th>
+							<th>Default</th>
+							<th>What it does</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>name</code></td>
+							<td>any text</td>
+							<td>none</td>
+							<td>The field name the form sends the code under, like <code>name</code> on an
+								<code>&lt;input&gt;</code>. <a href="#forms">Forms</a></td>
+						</tr>
+						<tr>
+							<td><code>id</code></td>
+							<td>any text</td>
+							<td>none</td>
+							<td>A normal HTML id. When there's no <code>name</code>, the form uses the id as the field name.
+							</td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td><code>json</code>, <code>javascript</code>, <code>typescript</code>, <code>jsx</code>,
+								<code>tsx</code>, <code>html</code>, <code>css</code>, <code>xml</code>, <code>shell</code>,
+								<code>text</code></td>
+							<td><code>text</code></td>
+							<td>Syntax highlighting, and how <code>minify</code> treats the code. <a
+									href="#languages">Languages</a></td>
+						</tr>
+						<tr>
+							<td><code>theme</code></td>
+							<td><code>light</code>, <code>intellij-dark</code> (or <code>dark</code>),
+								<code>vscode-dark</code>, <code>auto</code></td>
+							<td><code>auto</code></td>
+							<td>Colors. <code>auto</code> is <code>light</code>, or <code>intellij-dark</code> when the
+								computer is in dark mode. <a href="#themes">Themes</a></td>
+						</tr>
+						<tr>
+							<td><code>readonly</code></td>
+							<td>on / off</td>
+							<td>off</td>
+							<td>Can't be edited, but can be selected, searched and copied. <strong>Is</strong> sent with the
+								form. <a href="#readonly">Read-only and disabled</a></td>
+						</tr>
+						<tr>
+							<td><code>disabled</code></td>
+							<td>on / off</td>
+							<td>off</td>
+							<td>Faded out, can't be used, <strong>not</strong> sent with the form.</td>
+						</tr>
+						<tr>
+							<td><code>minify</code></td>
+							<td>on / off</td>
+							<td>off</td>
+							<td>The form receives the code without line breaks, indentation and comments. The editor keeps
+								showing it as typed. <a href="#minify">minify</a></td>
+						</tr>
+						<tr>
+							<td><code>width</code></td>
+							<td>a number (pixels) or any CSS length</td>
+							<td>full width</td>
+							<td>Width of the editor. <a href="#size">Size</a></td>
+						</tr>
+						<tr>
+							<td><code>height</code></td>
+							<td>a number (pixels) or any CSS length</td>
+							<td>grows with the code</td>
+							<td>Fixed height; longer code scrolls inside the editor.</td>
+						</tr>
+						<tr>
+							<td><code>indent</code></td>
+							<td><code>tab</code>, or a number of spaces</td>
+							<td>detected</td>
+							<td>What <kbd>Tab</kbd> inserts. Without it, the editor uses whatever the code already uses.</td>
+						</tr>
+						<tr>
+							<td><code>style</code></td>
+							<td>CSS</td>
+							<td>none</td>
+							<td>Styles the outer box (border, margins, <code>max-height</code>…) and can set the color
+								variables.</td>
+						</tr>
+						<tr>
+							<td><code>form</code></td>
+							<td>a form's id</td>
+							<td>the form around it</td>
+							<td>Sends the code with that form even when the editor isn't inside it.</td>
+						</tr>
+						<tr>
+							<td><code>aria-label</code></td>
+							<td>any text</td>
+							<td>none</td>
+							<td>What screen readers call the editor, when it has no <code>&lt;label for&gt;</code>.</td>
+						</tr>
+						<tr>
+							<td><code>hidden</code></td>
+							<td>on / off</td>
+							<td>off</td>
+							<td>Hides the editor, as on any HTML element. A hidden editor is still sent with its form.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="note warn">
+				<p><strong>On / off attributes are on whenever they're present, whatever their value.</strong>
+					<code>minify="false"</code> turns minify <em>on</em>, just like <code>disabled="false"</code> on an
+					<code>&lt;input&gt;</code>. To turn one off, leave the attribute out.</p>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="content">Putting code in the editor</h2>
+			<p>Paste the code between the tags and indent it to match your page. The editor removes the indentation that
+				every line shares, plus any blank lines at the start and end.</p>
+
+			<h3>Code that contains <code>&lt;</code>, HTML or XML</h3>
+			<p>The browser reads everything between <code>&lt;code-editor&gt;</code> and
+				<code>&lt;/code-editor&gt;</code> as HTML <em>before</em> the editor sees it. Code with no tags in it
+				(JSON, JavaScript, CSS, shell) is safe to paste. But HTML, XML, or code where <code>&lt;</code> is
+				directly followed by a letter (<code>if (a&lt;b)</code>) gets changed by the browser, and any
+				<code>&lt;script&gt;</code> or <code>&lt;style&gt;</code> in it would run.</p>
+
+			<p>Here's what goes wrong. The browser doesn't know XML's self-closing tags, so <code>&lt;gift-wrap/&gt;</code>
+				becomes an open tag that swallows the next line:</p>
+			<div class="example bad" data-label="Don't: markup pasted as-is">
+				<textarea class="source" hidden>
+					<code-editor language="xml">
+						<order id="7">
+							<gift-wrap/>
+							<item qty="2">Blue pen</item>
+						</order>
+					</code-editor>
+				</textarea>
+			</div>
+			<p>The editor shows its best reconstruction and logs a warning in the browser console. To keep markup exactly
+				as written, wrap it in <code>&lt;script type="text/plain"&gt;</code>. The browser never parses or runs
+				what's inside it:</p>
+			<div class="example good" data-label="Do: markup wrapped in script type=&quot;text/plain&quot;">
+				<textarea class="source" hidden>
+					<code-editor language="xml">
+						<script type="text/plain">
+							<order id="7">
+								<gift-wrap/>
+								<item qty="2">Blue pen</item>
+							</order>
+						</script>
+					</code-editor>
+				</textarea>
+			</div>
+			<p>Two other ways work too:</p>
+			<ul>
+				<li>A <code>&lt;textarea&gt;</code> wrapper instead of the script. Use it when the code itself contains
+					<code>&lt;/script&gt;</code>. It turns entities like <code>&amp;lt;</code> back into
+					<code>&lt;</code>.</li>
+				<li>Escaping <code>&lt;</code> as <code>&amp;lt;</code> and <code>&amp;</code> as <code>&amp;amp;</code>,
+					which server code can do for you (ColdFusion: <code>EncodeForHTML()</code>):</li>
+			</ul>
+			<div class="example" data-label="Escaped code">
+				<textarea class="source" hidden>
+					<code-editor language="javascript">
+						if (count &amp;lt; limit &amp;amp;&amp;amp; ready) send()
+					</code-editor>
+				</textarea>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="languages">Languages</h2>
+			<p>Set <code>language</code> to get syntax highlighting. Without it the code is plain text.</p>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th><code>language</code></th>
+							<th>Also accepted</th>
+							<th>Notes</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code>json</code></td><td></td><td></td></tr>
+						<tr><td><code>javascript</code></td><td><code>js</code></td><td></td></tr>
+						<tr><td><code>typescript</code></td><td><code>ts</code></td><td></td></tr>
+						<tr><td><code>jsx</code>, <code>tsx</code></td><td></td><td>JavaScript / TypeScript with JSX
+								(React)</td></tr>
+						<tr><td><code>html</code></td><td><code>htm</code></td><td>Also highlights the JavaScript and CSS
+								inside <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code></td></tr>
+						<tr><td><code>css</code></td><td></td><td></td></tr>
+						<tr><td><code>xml</code></td><td><code>svg</code></td><td></td></tr>
+						<tr><td><code>shell</code></td><td><code>bash</code>, <code>sh</code></td><td>Good for
+								<code>curl</code> examples</td></tr>
+						<tr><td><code>text</code></td><td><code>plain</code>, <code>plaintext</code>, <code>txt</code></td>
+							<td>The default: no highlighting</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<p>An unknown name shows plain text and logs a warning in the console. The language can also change while
+				the page is open. This playground sets the <code>language</code> property from JavaScript:</p>
+			<div class="playground">
+				<div class="row">
+					<label class="check">Language
+						<select id="language-select"></select>
+					</label>
+				</div>
+				<div id="language-slot"></div>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="themes">Themes and colors</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th><code>theme</code></th>
+							<th>Looks like</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><em>none</em> or <code>auto</code></td><td><code>light</code>, or
+								<code>intellij-dark</code> when the computer is in dark mode</td></tr>
+						<tr><td><code>light</code></td><td>Light, GitHub-style colors</td></tr>
+						<tr><td><code>intellij-dark</code> or <code>dark</code></td><td>IntelliJ IDEA's default dark editor
+								colors</td></tr>
+						<tr><td><code>vscode-dark</code></td><td>VS Code's default dark theme</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div id="theme-gallery"></div>
+
+			<h3>Adjusting colors and fonts</h3>
+			<p>Every color and font is a CSS variable named <code>--code-editor-…</code>. Set them in the
+				<code>style</code> attribute for one editor, or in your stylesheet for all of them:</p>
+			<div class="example">
+				<textarea class="source" hidden>
+					<code-editor language="javascript" theme="vscode-dark"
+						style="--code-editor-font-size: 15px; --code-editor-radius: 0; --code-editor-bg: #000000">
+						const answer = 42 // bigger text, square corners, black background
+					</code-editor>
+				</textarea>
+			</div>
+			<div class="example" data-only="code" data-label="CSS" data-language="css">
+				<textarea class="source" hidden>
+					/* Every editor on the page */
+					code-editor {
+						--code-editor-font-size: 14px;
+					}
+
+					/* Only editors with one theme */
+					code-editor[theme="vscode-dark"] {
+						--code-editor-bg: #181818;
+					}
+				</textarea>
+			</div>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Variable</th>
+							<th>Changes</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code>--code-editor-font</code>, <code>-font-size</code>, <code>-line-height</code></td>
+							<td>Text</td></tr>
+						<tr><td><code>--code-editor-border</code>, <code>-radius</code></td><td>Outer box</td></tr>
+						<tr><td><code>--code-editor-bg</code>, <code>-fg</code>, <code>-panel-bg</code></td><td>Background,
+								text, search panel and pop-ups</td></tr>
+						<tr><td><code>--code-editor-gutter-bg</code>, <code>-gutter-border</code>, <code>-muted</code>,
+								<code>-gutter-active</code></td><td>Line numbers column</td></tr>
+						<tr><td><code>--code-editor-active-line</code>, <code>-selection</code>, <code>-cursor</code></td>
+							<td>Editing</td></tr>
+						<tr><td><code>--code-editor-focus</code>, <code>-focus-ring</code></td><td>Outline while the editor
+								has focus</td></tr>
+						<tr><td><code>--code-editor-match</code>, <code>-search</code>, <code>-search-current</code>,
+								<code>-bracket</code>, <code>-bracket-border</code></td><td>Highlighted matches and
+								brackets</td></tr>
+						<tr><td><code>--code-editor-keyword</code>, <code>-control</code>, <code>-constant</code>,
+								<code>-string</code>, <code>-regexp</code>, <code>-escape</code>, <code>-number</code>,
+								<code>-comment</code>, <code>-comment-style</code>, <code>-variable</code>,
+								<code>-property</code>, <code>-function</code>, <code>-type</code>, <code>-tag</code>,
+								<code>-tag-bracket</code>, <code>-attribute</code>, <code>-meta</code>,
+								<code>-invalid</code></td><td>Syntax colors (<code>-comment-style</code> is
+								<code>italic</code> or <code>normal</code>)</td></tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="size">Size</h2>
+			<p>By default the editor is as wide as its container and grows with its code. Use <code>height</code> for a
+				fixed height, or <code>style="max-height: …"</code> to let it grow up to a limit. Longer code scrolls
+				inside the editor.</p>
+			<div class="example">
+				<textarea class="source" hidden>
+					<code-editor language="javascript" height="110">
+						// height="110": a fixed height, scrolls inside
+						const one = 1
+						const two = 2
+						const three = 3
+						const four = 4
+						const five = 5
+						const six = 6
+					</code-editor>
+
+					<code-editor language="javascript" style="max-height: 150px">
+						// style="max-height: 150px": grows up to 150px, then scrolls
+						const one = 1
+						const two = 2
+						const three = 3
+						const four = 4
+						const five = 5
+						const six = 6
+						const seven = 7
+					</code-editor>
+
+					<code-editor language="json" width="320">
+						{ "width": "320 pixels" }
+					</code-editor>
+				</textarea>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="editing">Editing and keyboard</h2>
+			<p>The editor works like VS Code or IntelliJ. Shortcuts use <kbd>Ctrl</kbd> on Windows and Linux and
+				<kbd>Cmd</kbd> on a Mac.</p>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Keys</th>
+							<th>What happens</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Indent / outdent. With text
+								selected, the whole lines move.</td></tr>
+						<tr><td><kbd>Esc</kbd>, then <kbd>Tab</kbd></td><td>Leave the editor and go to the next field
+								(<kbd>Tab</kbd> alone indents)</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+click or <kbd>Alt</kbd>+click</td><td>Add another cursor</td></tr>
+						<tr><td><kbd>Alt</kbd>+drag</td><td>Select a rectangle (column selection)</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td><td>Add a cursor on the
+								line above / below</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Also select the next occurrence of the current word
+							</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td><td>Select every occurrence</td></tr>
+						<tr><td><kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td><td>Move the line up / down</td></tr>
+						<tr><td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd></td><td>Copy the line up /
+								down</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>Comment / uncomment</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd></td><td>Indent / outdent the
+								line</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Find and replace. <kbd>F3</kbd> /
+								<kbd>Shift</kbd>+<kbd>F3</kbd>: next / previous match.</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>G</kbd></td><td>Go to line</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>Space</kbd></td><td>Suggestions (HTML tags, CSS properties, JavaScript
+								names)</td></tr>
+						<tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> or
+								<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td><td>Undo / redo</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<p>Brackets and quotes close themselves, the matching bracket lights up, and the arrows next to the line
+				numbers fold blocks of code. What <kbd>Tab</kbd> inserts comes from the code itself: tabs if it's indented
+				with tabs, otherwise spaces. <code>indent="tab"</code> or <code>indent="4"</code> sets it explicitly.</p>
+			<p>Try it here: click on <code>price</code>, press <kbd>Ctrl</kbd>+<kbd>D</kbd> three times, and type a new
+				name. Or hold <kbd>Alt</kbd> and drag down across the start of the lines.</p>
+			<div class="example">
+				<textarea class="source" hidden>
+					<code-editor language="javascript" indent="4">
+						const price = 10
+						const total = price * 2
+						console.log(price, total)
+						export { price }
+					</code-editor>
+				</textarea>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="readonly">Read-only and disabled</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th></th>
+							<th><code>readonly</code></th>
+							<th><code>disabled</code></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td>Edit the code</td><td>No</td><td>No</td></tr>
+						<tr><td>Select, copy, search</td><td>Yes</td><td>No</td></tr>
+						<tr><td>Reach it with <kbd>Tab</kbd></td><td>Yes (<kbd>Tab</kbd> then moves on, it doesn't indent)
+							</td><td>No</td></tr>
+						<tr><td>Sent with the form</td><td>Yes</td><td>No</td></tr>
+						<tr><td>Looks</td><td>Normal</td><td>Faded</td></tr>
+						<tr><td>Good for</td><td>Documentation and code samples</td><td>Fields that don't apply right
+								now</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="example">
+				<textarea class="source" hidden>
+					<code-editor language="shell" readonly>
+						curl -X POST https://api.example.com/v1/orders \
+							-H "Content-Type: application/json" \
+							-d '{"customer": "Ada Lovelace", "items": 2}'
+					</code-editor>
+
+					<code-editor language="javascript" disabled>
+						const locked = true // disabled: faded, can't be used, not sent
+					</code-editor>
+				</textarea>
+			</div>
+			<p>Editors inside a disabled <code>&lt;fieldset&gt;</code> are disabled too. Try the checkbox in the
+				<a href="#forms">form example</a>.</p>
+
+			<!-- ================================================================== -->
+			<h2 id="forms">Forms</h2>
+			<p>Give the editor a <code>name</code> and it's sent with its form like any other field. You don't need any
+				JavaScript, and it works with:</p>
+			<ul>
+				<li>a normal submit: a submit button, or <code>form.submit()</code>;</li>
+				<li><code>new FormData(form)</code> and <code>fetch</code>;</li>
+				<li>jQuery: <code>$(form).serialize()</code>, <code>$(form).serializeArray()</code> and
+					<code>$.post(url, $(form).serialize())</code>.</li>
+			</ul>
+			<p>The form below sends to this same page, so after <strong>Submit</strong> you'll see what arrived under the
+				buttons.</p>
+			<div class="example">
+				<textarea class="source" hidden>
+					<form id="demo-form" method="get" action="#forms">
+						<label for="payload">Request body: JSON, minified when sent</label>
+						<code-editor id="payload" name="payload" language="json" minify height="200">
+							{
+								"customer": "Ada Lovelace",
+								"items": [
+									{ "sku": "PEN-01", "qty": 2 },
+									{ "sku": "INK-07", "qty": 1 }
+								],
+								"note": "Leave it at   the door"
+							}
+						</code-editor>
+
+						<label for="query">Query: plain text, sent exactly as typed</label>
+						<code-editor id="query" name="query">
+							SELECT id, name
+							FROM users
+							WHERE status = 'active'
+								AND created_at > '2026-01-01';
+						</code-editor>
+
+						<fieldset id="extra">
+							<legend>In a fieldset, with an id but no name (sent as "script")</legend>
+							<code-editor id="script" language="javascript" indent="4">
+								function total(items) {
+									return items.reduce((sum, item) => sum + item.qty, 0)
+								}
+							</code-editor>
+						</fieldset>
+
+						<div class="row">
+							<button type="submit">Submit</button>
+							<button type="reset">Reset</button>
+						</div>
+					</form>
+
+					<label for="comment">Outside the form, joined to it with form="demo-form"</label>
+					<code-editor id="comment" name="comment" form="demo-form">
+						This note is sent with the form above.
+					</code-editor>
+				</textarea>
+			</div>
+			<div class="row">
+				<button type="button" id="show-formdata"><code>new FormData(form)</code></button>
+				<button type="button" id="show-serialize"><code>$(form).serialize()</code></button>
+				<label class="check"><input type="checkbox" id="toggle-fieldset"> Disable the fieldset</label>
+			</div>
+			<pre class="output" id="output">Submit the form, or use a button above, to see what gets sent.</pre>
+
+			<h3>Good to know</h3>
+			<ul>
+				<li><strong>Line breaks arrive as <code>\r\n</code>.</strong> Browsers send every multi-line form field
+					that way, so ColdFusion receives <code>\r\n</code> in <code>FORM.query</code>. Tabs and spaces arrive
+					as typed.</li>
+				<li><strong>Reset</strong> brings back the code the page loaded with.</li>
+				<li><code>readonly</code> editors are sent; <code>disabled</code> ones, and editors in a disabled
+					<code>&lt;fieldset&gt;</code>, are not.</li>
+				<li>An editor without <code>name</code> or <code>id</code> isn't sent.</li>
+			</ul>
+
+			<!-- ================================================================== -->
+			<h2 id="minify">minify</h2>
+			<p>With <code>minify</code>, the form receives the code without the whitespace that's only there for layout
+				(line breaks, tabs, indentation) and without comments. The editor keeps showing the code as typed.</p>
+			<p>It never changes what's inside strings, template literals, regular expressions, attribute values or CDATA
+				sections, and it keeps one space wherever two words would otherwise run together
+				(<code>return x</code> stays <code>return x</code>).</p>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Language</th>
+							<th>What the form receives</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code>json</code></td><td>Standard compact JSON: <code>{"a":1,"b":[1,2]}</code>. Invalid JSON
+								is stripped the same way, never rewritten.</td></tr>
+						<tr><td><code>javascript</code>, <code>typescript</code>, <code>jsx</code>, <code>tsx</code></td>
+							<td>No whitespace or comments. A line break stays where removing it could change what the code
+								does, for example between statements without semicolons.</td></tr>
+						<tr><td><code>css</code></td><td>No whitespace or comments, except spaces that matter
+								(<code>.a .b</code>, <code>calc(1px + 2px)</code>).</td></tr>
+						<tr><td><code>html</code>, <code>xml</code></td><td>No whitespace between tags and no comments.
+								Whitespace in text becomes one space (also inside <code>&lt;pre&gt;</code>).
+								<code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> follow the JavaScript and CSS
+								rules.</td></tr>
+						<tr><td><code>text</code></td><td>Every run of whitespace becomes one space.</td></tr>
+						<tr><td><code>shell</code></td><td>Unchanged: in shell scripts, line breaks and spaces separate
+								commands and arguments.</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<p>Edit the code or pick another language to see exactly what would be sent:</p>
+			<div class="playground">
+				<div class="row">
+					<label class="check">Language
+						<select id="minify-select"></select>
+					</label>
+				</div>
+				<div id="minify-slot"></div>
+				<label class="field" for="minify-output">The form receives <span class="muted"
+						id="minify-count"></span></label>
+				<pre class="output" id="minify-output"></pre>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="javascript">JavaScript and jQuery</h2>
+			<p>You don't need JavaScript to use the editor, but it behaves like a <code>&lt;textarea&gt;</code> when you
+				do.</p>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Property / method / event</th>
+							<th>What it does</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code>editor.value</code></td><td>The code as shown, with <code>\n</code> line breaks.
+								Setting it replaces the code.</td></tr>
+						<tr><td><code>editor.submitValue</code></td><td>What the form will send: <code>value</code>,
+								minified when <code>minify</code> is on. Read-only.</td></tr>
+						<tr><td><code>editor.readOnly</code>, <code>disabled</code>, <code>minify</code></td><td>
+								<code>true</code> / <code>false</code>. Same as adding or removing the attribute.</td></tr>
+						<tr><td><code>editor.language</code>, <code>editor.name</code></td><td>Read or change the
+								attribute.</td></tr>
+						<tr><td><code>editor.form</code></td><td>The form the editor belongs to.</td></tr>
+						<tr><td><code>editor.focus()</code></td><td>Puts the cursor in the editor.</td></tr>
+						<tr><td><code>input</code> event</td><td>Fires on every edit.</td></tr>
+						<tr><td><code>change</code> event</td><td>Fires when the editor loses focus after its code changed.
+							</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<p>With jQuery: <code>$('#id').val()</code> reads the code, <code>$('#id').val('…')</code> replaces it, and
+				<code>$('#id').on('input change', …)</code> listens for edits. Editors added later with
+				<code>.html()</code>, <code>.append()</code> or <code>.load()</code> work too.</p>
+			<div class="note warn">
+				<p>Change the code with <code>.value</code> or <code>.val()</code>, never with <code>.html()</code>,
+					<code>.text()</code> or <code>innerHTML</code> on the editor itself: those delete the hidden field
+					that carries the code to the form.</p>
+			</div>
+			<p>Try the API on this editor. Each button runs the code shown on it, and the log shows the results and
+				events:</p>
+			<div class="playground">
+				<div id="api-slot"></div>
+				<div class="row" id="api-buttons"></div>
+				<pre class="output" id="api-log"></pre>
+			</div>
+
+			<!-- ================================================================== -->
+			<h2 id="accessibility">Accessibility</h2>
+			<ul>
+				<li><strong>Labels:</strong> a <code>&lt;label for="editor-id"&gt;</code> works as with any field:
+					clicking it puts the cursor in the editor, and screen readers read it as the editor's name. Without a
+					visible label, use <code>aria-label</code>.</li>
+				<li><strong>Keyboard:</strong> <kbd>Tab</kbd> indents inside the editor, so press <kbd>Esc</kbd> and then
+					<kbd>Tab</kbd> to move to the next field. In <code>readonly</code> editors, <kbd>Tab</kbd> moves on
+					right away.</li>
+				<li><strong>Focus:</strong> the editor shows a visible outline while it has focus.</li>
+			</ul>
+
+			<!-- ================================================================== -->
+			<h2 id="troubleshooting">Troubleshooting</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>Problem</th>
+							<th>Why, and what to do</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>The code looks different from what I wrote</td>
+							<td>The browser parsed it as HTML. Wrap it in <code>&lt;script type="text/plain"&gt;</code>. See
+								<a href="#content">Putting code in</a>. The console shows a warning when this happens.</td>
+						</tr>
+						<tr>
+							<td><code>minify="false"</code> still minifies</td>
+							<td>On / off attributes are on whenever present. Leave the attribute out.</td>
+						</tr>
+						<tr>
+							<td>The form doesn't send the code</td>
+							<td>The editor needs a <code>name</code> (or <code>id</code>) and must not be
+								<code>disabled</code>. Also check that no script replaced its content with
+								<code>.html()</code> or <code>.text()</code>.</td>
+						</tr>
+						<tr>
+							<td>The server gets <code>\r\n</code> line breaks</td>
+							<td>Normal for every multi-line form field.</td>
+						</tr>
+						<tr>
+							<td><kbd>Tab</kbd> doesn't go to the next field</td>
+							<td>It indents. Press <kbd>Esc</kbd> first.</td>
+						</tr>
+						<tr>
+							<td>The console says "unknown language" or "unknown theme"</td>
+							<td>Check the spelling against the <a href="#languages">language</a> and
+								<a href="#themes">theme</a> lists.</td>
+						</tr>
+						<tr>
+							<td>My HTML formatter changed the code inside <code>&lt;code-editor&gt;</code></td>
+							<td>Formatters treat it as normal HTML text. Tell yours to leave it alone. In VS Code, add it to
+								the <code>html.format.contentUnformatted</code> setting
+								(<code>"pre,code,textarea,code-editor"</code>).</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="muted">Works in current Chrome, Edge, Firefox and Safari (Chrome/Edge 102+, Firefox 112+,
+				Safari 16.4+).</p>
+		</main>
+	</div>
+
+	<script>
+		// Demo-only code: builds the examples and playgrounds on this page.
+		// None of it is needed to use <code-editor>.
+		(() => {
+			const $ = (selector) => document.querySelector(selector)
+
+			// An editor whose code is set through a <textarea> child, so it is read exactly.
+			function makeEditor(attributes, code) {
+				const editor = document.createElement('code-editor')
+				for (const [name, value] of Object.entries(attributes)) editor.setAttribute(name, value)
+				const raw = document.createElement('textarea')
+				raw.textContent = code
+				editor.append(raw)
+				return editor
+			}
+
+			function pane(label, content, className = '') {
+				const wrap = document.createElement('div')
+				wrap.className = className
+				const title = document.createElement('div')
+				title.className = 'pane-label'
+				title.textContent = label
+				wrap.append(title, content)
+				return wrap
+			}
+
+			// Each .example holds its markup in a hidden <textarea class="source">:
+			// show that markup as code, then render it for real below.
+			for (const example of document.querySelectorAll('.example')) {
+				const source = example.querySelector('textarea.source')
+				const markup = source.value
+				const code = makeEditor({ language: example.dataset.language || 'html', readonly: '', class: 'example-code' }, markup)
+				const parts = [pane(example.dataset.label || 'HTML', code)]
+				if (example.dataset.only !== 'code') {
+					const result = document.createElement('div')
+					result.className = 'example-result'
+					result.innerHTML = markup
+					parts.push(pane('Result', result, 'pane-result'))
+				}
+				source.replaceWith(...parts)
+			}
+
+			const SAMPLES = {
+				json: `{
+  "customer": "Ada Lovelace",
+  "items": [
+    { "sku": "PEN-01", "qty": 2, "gift": false }
+  ],
+  "note": "Leave it at   the door",
+  "coupon": null
+}`,
+				javascript: `// Total price of the items in the cart
+export function total(items, taxRate = 0.16) {
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0)
+  if (subtotal === 0) return 0
+  return Math.round(subtotal * (1 + taxRate) * 100) / 100
+}`,
+				typescript: `interface Item {
+  sku: string
+  price: number
+  qty: number
+}
+
+export function total(items: Item[], taxRate = 0.16): number {
+  return items.reduce((sum, item) => sum + item.price * item.qty, 0) * (1 + taxRate)
+}`,
+				jsx: `export function Cart({ items }) {
+  return (
+    <ul className="cart">
+      {items.map((item) => (
+        <li key={item.sku}>{item.name}</li>
+      ))}
+    </ul>
+  )
+}`,
+				tsx: `type Props = { items: { sku: string; name: string }[] }
+
+export function Cart({ items }: Props) {
+  return <ul className="cart">{items.map((item) => <li key={item.sku}>{item.name}</li>)}</ul>
+}`,
+				html: `<!-- Order form -->
+<form action="/orders" method="post">
+  <label for="qty">Quantity</label>
+  <input id="qty" name="qty" type="number" value="1">
+  <button type="submit">Order</button>
+</form>
+<style>
+  .buy { color: white; background: #1f883d; }
+</style>
+<script>
+  document.querySelector('form').addEventListener('submit', () => console.log('sent'))
+<\/script>`,
+				css: `/* Buttons */
+.button,
+.button:visited {
+  color: #ffffff;
+  background: #1f883d;
+  padding: 6px 12px;
+}
+
+@media (max-width: 600px) {
+  .button { width: calc(100% - 24px); }
+}`,
+				xml: `<?xml version="1.0" encoding="UTF-8"?>
+<!-- Order sent to the warehouse -->
+<order id="7" priority="high">
+  <customer>Ada Lovelace</customer>
+  <item sku="PEN-01" qty="2"/>
+  <note><![CDATA[Leave it at   the door]]></note>
+</order>`,
+				shell: `# Create an order
+curl -X POST https://api.example.com/v1/orders \\
+  -H "Content-Type: application/json" \\
+  -d '{"customer": "Ada Lovelace", "items": 2}'`,
+				text: `Plain text has no highlighting.
+Tabs, line breaks and    spaces
+are kept exactly as typed.`,
+			}
+
+			// A <select> that swaps the editor's language and code.
+			function languagePicker(select, editor, languages, onChange = () => {}) {
+				for (const language of languages) select.add(new Option(language, language))
+				select.addEventListener('change', () => {
+					editor.language = select.value
+					editor.value = SAMPLES[select.value]
+					onChange()
+				})
+			}
+
+			// Languages playground
+			const languageEditor = makeEditor({ id: 'language-editor', language: 'json' }, SAMPLES.json)
+			$('#language-slot').append(languageEditor)
+			languagePicker($('#language-select'), languageEditor, Object.keys(SAMPLES))
+
+			// minify playground
+			const minifyEditor = makeEditor({ id: 'minify-editor', language: 'json', minify: '' }, SAMPLES.json)
+			$('#minify-slot').append(minifyEditor)
+			const showMinified = () => {
+				const sent = minifyEditor.submitValue
+				$('#minify-output').textContent = sent
+				$('#minify-count').textContent = `(${minifyEditor.value.length} characters → ${sent.length})`
+			}
+			languagePicker($('#minify-select'), minifyEditor, ['json', 'javascript', 'html', 'xml', 'css', 'text', 'shell'], showMinified)
+			minifyEditor.addEventListener('input', showMinified)
+			customElements.whenDefined('code-editor').then(showMinified)
+
+			// Theme gallery
+			const THEME_SAMPLES = [
+				['javascript', `// Sends the order and returns the receipt
+async function buy(sku, qty = 1) {
+  const res = await fetch(\`/api/orders/\${sku}\`)
+  if (!res.ok) return null
+  return /^\\d+$/.test(qty) && res.json()
+}`],
+				['html', `<!-- Order button -->
+<button class="buy" data-sku="PEN-01">
+  Buy now
+</button>`],
+				['json', `{
+  "id": 42,
+  "status": "shipped",
+  "paid": true,
+  "coupon": null
+}`],
+			]
+			for (const theme of ['light', 'intellij-dark', 'vscode-dark']) {
+				const title = document.createElement('h3')
+				title.innerHTML = `<code>theme="${theme}"</code>`
+				const row = document.createElement('div')
+				row.className = 'theme-row'
+				for (const [language, code] of THEME_SAMPLES) row.append(makeEditor({ language, theme, readonly: '' }, code))
+				$('#theme-gallery').append(title, row)
+			}
+
+			// JavaScript API playground
+			const apiEditor = makeEditor({ id: 'api-editor', language: 'json', minify: '' }, '{\n  "status": "active",\n  "items": [1, 2, 3]\n}')
+			$('#api-slot').append(apiEditor)
+			const log = (line) => {
+				const output = $('#api-log')
+				output.textContent = `${line}\n${output.textContent}`.split('\n').slice(0, 12).join('\n')
+			}
+			const ACTIONS = [
+				['editor.value', () => JSON.stringify(apiEditor.value)],
+				['editor.submitValue', () => JSON.stringify(apiEditor.submitValue)],
+				["editor.value = '{\"new\": true}'", () => { apiEditor.value = '{"new": true}' }],
+				['editor.readOnly = !editor.readOnly', () => (apiEditor.readOnly = !apiEditor.readOnly)],
+				['editor.disabled = !editor.disabled', () => (apiEditor.disabled = !apiEditor.disabled)],
+				['editor.minify = !editor.minify', () => (apiEditor.minify = !apiEditor.minify)],
+				['editor.focus()', () => apiEditor.focus()],
+				["$('#api-editor').val()", () => (window.jQuery ? JSON.stringify(jQuery('#api-editor').val()) : 'jQuery did not load')],
+			]
+			for (const [label, run] of ACTIONS) {
+				const button = document.createElement('button')
+				button.type = 'button'
+				button.innerHTML = `<code></code>`
+				button.firstChild.textContent = label
+				button.addEventListener('click', () => {
+					const result = run()
+					log(result === undefined ? `> ${label}` : `> ${label}\n  ${result}`)
+				})
+				$('#api-buttons').append(button)
+			}
+			apiEditor.addEventListener('input', () => log('event: input'))
+			apiEditor.addEventListener('change', () => log('event: change'))
+			log('Click a button, or type in the editor.')
+
+			// Form tools
+			const form = $('#demo-form')
+			const show = (title, pairs) => {
+				$('#output').textContent = `${title}\n\n` + pairs.map(([name, value]) => `${name} = ${JSON.stringify(value)}`).join('\n')
+			}
+			const received = [...new URLSearchParams(location.search)]
+			if (received.length) show('Received by the server (normal submit):', received)
+			$('#show-formdata').addEventListener('click', () => show('new FormData(form):', [...new FormData(form)]))
+			$('#show-serialize').addEventListener('click', () => {
+				if (!window.jQuery) return show('jQuery did not load (it comes from code.jquery.com).', [])
+				show('$(form).serialize(), decoded:', [...new URLSearchParams(jQuery(form).serialize())])
+			})
+			$('#toggle-fieldset').addEventListener('change', (event) => {
+				$('#extra').disabled = event.target.checked
+			})
+		})()
+	</script>
+</body>
+
+</html>

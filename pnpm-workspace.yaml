@@ -1,0 +1,8 @@
+# pnpm settings for this project (it is not a monorepo: the only package is the root).
+packages:
+  - "."
+
+# esbuild ships a small install script that checks its native binary.
+# pnpm 10+ blocks dependency install scripts unless they are approved here.
+allowBuilds:
+  esbuild: true

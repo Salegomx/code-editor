@@ -1,0 +1,10 @@
+node_modules/
+dist/
+
+# pnpm is the only package manager. These files appear only if someone runs
+# npm, yarn or bun by mistake (see README).
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
+bun.lock
+bun.lockb
