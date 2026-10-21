@@ -13,9 +13,12 @@ import {
 } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentLess, indentMore, redo } from '@codemirror/commands'
 import { bracketMatching, foldGutter, foldKeymap, indentOnInput, indentUnit } from '@codemirror/language'
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
-import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
-import { minifyLanguageData, resolveLanguage } from './languages.js'
+// The search panel (Ctrl+F, F3, Ctrl+Alt+G) is turned off to keep the file smaller.
+// To bring it back, uncomment searchKeymap here and in the keymap below.
+import { highlightSelectionMatches, selectNextOccurrence, selectSelectionMatches /*, searchKeymap */ } from '@codemirror/search'
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete'
+import { languageData, resolveLanguage } from './languages.js'
+import { closeTags } from './close-tags.js'
 import { minify } from './minify.js'
 import { detectIndent, readInitialContent } from './content.js'
 import { editorTheme, hostStyles, syntaxColors, themeNames } from './theme.js'
@@ -263,7 +266,7 @@ export class CodeEditor extends HTMLElement {
 				indentOnInput(),
 				bracketMatching(),
 				closeBrackets(),
-				autocompletion(),
+				closeTags,
 				rectangularSelection(),
 				crosshairCursor(),
 				highlightActiveLine(),
@@ -274,16 +277,17 @@ export class CodeEditor extends HTMLElement {
 					{ key: 'Tab', run: indentOrInsert, shift: indentLess },
 					// CodeMirror only binds Ctrl+Y for redo on Windows; VS Code also accepts Ctrl+Shift+Z.
 					{ key: 'Mod-Shift-z', run: redo, preventDefault: true },
+					{ key: 'Mod-d', run: selectNextOccurrence, preventDefault: true },
+					{ key: 'Mod-Shift-l', run: selectSelectionMatches },
 					...closeBracketsKeymap,
 					...defaultKeymap,
-					...searchKeymap,
+					// ...searchKeymap,
 					...historyKeymap,
 					...foldKeymap,
-					...completionKeymap,
 				]),
 				editorTheme,
 				syntaxColors,
-				minifyLanguageData,
+				languageData,
 				this.#language.of(resolveLanguage(this.getAttribute('language')).extension),
 				this.#indent.of(this.#indentExtension(doc)),
 				this.#editable.of(this.#editableExtension()),
@@ -311,7 +315,7 @@ export class CodeEditor extends HTMLElement {
 		const attribute = (this.getAttribute('indent') ?? '').trim().toLowerCase()
 		const width = Number.parseInt(attribute, 10)
 		const unit = attribute === 'tab' ? '\t' : width > 0 ? ' '.repeat(Math.min(width, 8)) : detectIndent(doc)
-		return [indentUnit.of(unit), EditorState.tabSize.of(unit === '\t' ? 4 : unit.length)]
+		return [indentUnit.of(unit), EditorState.tabSize.of(4)]
 	}
 
 	#editableExtension() {

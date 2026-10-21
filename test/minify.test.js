@@ -2,10 +2,10 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { EditorState } from '@codemirror/state'
 import { minify } from '../src/minify.js'
-import { resolveLanguage, minifyLanguageData } from '../src/languages.js'
+import { resolveLanguage, languageData } from '../src/languages.js'
 
 const run = (language, doc) =>
-  minify(EditorState.create({ doc, extensions: [resolveLanguage(language).extension, minifyLanguageData] }))
+  minify(EditorState.create({ doc, extensions: [resolveLanguage(language).extension, languageData] }))
 
 test('json: removes all layout whitespace, keeps strings exactly', () => {
   const doc = '{\n\t"name":  "Ada  Lovelace",\r\n  "tags": [ "a b", 1, true ],\n  "my  key": { "x": null }\n}\n'

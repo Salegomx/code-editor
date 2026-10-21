@@ -15,9 +15,9 @@ test('dedent: leaves unindented code alone', () => {
   assert.equal(dedent('a\n  b'), 'a\n  b')
 })
 
-test('detectIndent: tabs, 2 or 4 spaces, default 2', () => {
+test('detectIndent: tabs, 2 or 4 spaces, default a tab', () => {
   assert.equal(detectIndent('if (x) {\n\ty()\n}'), '\t')
   assert.equal(detectIndent('a:\n    b:\n        c'), '    ')
   assert.equal(detectIndent('{\n  "a": {\n    "b": 1\n  }\n}'), '  ')
-  assert.equal(detectIndent('SELECT 1'), '  ')
+  assert.equal(detectIndent('SELECT 1'), '\t')
 })

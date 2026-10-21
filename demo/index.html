@@ -468,17 +468,15 @@
 						</tr>
 						<tr>
 							<td><code>language</code></td>
-							<td><code>json</code>, <code>javascript</code>, <code>typescript</code>, <code>jsx</code>,
-								<code>tsx</code>, <code>html</code>, <code>css</code>, <code>xml</code>, <code>shell</code>,
-								<code>text</code></td>
+							<td><code>json</code>, <code>javascript</code>, <code>html</code>, <code>css</code>,
+								<code>xml</code>, <code>shell</code>, <code>text</code></td>
 							<td><code>text</code></td>
 							<td>Syntax highlighting, and how <code>minify</code> treats the code. <a
 									href="#languages">Languages</a></td>
 						</tr>
 						<tr>
 							<td><code>theme</code></td>
-							<td><code>light</code>, <code>intellij-dark</code> (or <code>dark</code>),
-								<code>vscode-dark</code>, <code>auto</code></td>
+							<td><code>light</code>, <code>intellij-dark</code> (or <code>dark</code>), <code>auto</code></td>
 							<td><code>auto</code></td>
 							<td>Colors. <code>auto</code> is <code>light</code>, or <code>intellij-dark</code> when the
 								computer is in dark mode. <a href="#themes">Themes</a></td>
@@ -487,7 +485,7 @@
 							<td><code>readonly</code></td>
 							<td>on / off</td>
 							<td>off</td>
-							<td>Can't be edited, but can be selected, searched and copied. <strong>Is</strong> sent with the
+							<td>Can't be edited, but can be selected and copied. <strong>Is</strong> sent with the
 								form. <a href="#readonly">Read-only and disabled</a></td>
 						</tr>
 						<tr>
@@ -625,9 +623,6 @@
 					<tbody>
 						<tr><td><code>json</code></td><td></td><td></td></tr>
 						<tr><td><code>javascript</code></td><td><code>js</code></td><td></td></tr>
-						<tr><td><code>typescript</code></td><td><code>ts</code></td><td></td></tr>
-						<tr><td><code>jsx</code>, <code>tsx</code></td><td></td><td>JavaScript / TypeScript with JSX
-								(React)</td></tr>
 						<tr><td><code>html</code></td><td><code>htm</code></td><td>Also highlights the JavaScript and CSS
 								inside <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code></td></tr>
 						<tr><td><code>css</code></td><td></td><td></td></tr>
@@ -666,7 +661,6 @@
 						<tr><td><code>light</code></td><td>Light, GitHub-style colors</td></tr>
 						<tr><td><code>intellij-dark</code> or <code>dark</code></td><td>IntelliJ IDEA's default dark editor
 								colors</td></tr>
-						<tr><td><code>vscode-dark</code></td><td>VS Code's default dark theme</td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -677,7 +671,7 @@
 				<code>style</code> attribute for one editor, or in your stylesheet for all of them:</p>
 			<div class="example">
 				<textarea class="source" hidden>
-					<code-editor language="javascript" theme="vscode-dark"
+					<code-editor language="javascript" theme="intellij-dark"
 						style="--code-editor-font-size: 15px; --code-editor-radius: 0; --code-editor-bg: #000000">
 						const answer = 42 // bigger text, square corners, black background
 					</code-editor>
@@ -691,8 +685,8 @@
 					}
 
 					/* Only editors with one theme */
-					code-editor[theme="vscode-dark"] {
-						--code-editor-bg: #181818;
+					code-editor[theme="intellij-dark"] {
+						--code-editor-bg: #2b2b2b;
 					}
 				</textarea>
 			</div>
@@ -709,7 +703,7 @@
 							<td>Text</td></tr>
 						<tr><td><code>--code-editor-border</code>, <code>-radius</code></td><td>Outer box</td></tr>
 						<tr><td><code>--code-editor-bg</code>, <code>-fg</code>, <code>-panel-bg</code></td><td>Background,
-								text, search panel and pop-ups</td></tr>
+								text, folded-code marker</td></tr>
 						<tr><td><code>--code-editor-gutter-bg</code>, <code>-gutter-border</code>, <code>-muted</code>,
 								<code>-gutter-active</code></td><td>Line numbers column</td></tr>
 						<tr><td><code>--code-editor-active-line</code>, <code>-selection</code>, <code>-cursor</code></td>
@@ -794,19 +788,18 @@
 						<tr><td><kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>Comment / uncomment</td></tr>
 						<tr><td><kbd>Ctrl</kbd>+<kbd>]</kbd> / <kbd>Ctrl</kbd>+<kbd>[</kbd></td><td>Indent / outdent the
 								line</td></tr>
-						<tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>Find and replace. <kbd>F3</kbd> /
-								<kbd>Shift</kbd>+<kbd>F3</kbd>: next / previous match.</td></tr>
-						<tr><td><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>G</kbd></td><td>Go to line</td></tr>
-						<tr><td><kbd>Ctrl</kbd>+<kbd>Space</kbd></td><td>Suggestions (HTML tags, CSS properties, JavaScript
-								names)</td></tr>
 						<tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd> or
 								<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td><td>Undo / redo</td></tr>
 					</tbody>
 				</table>
 			</div>
 			<p>Brackets and quotes close themselves, the matching bracket lights up, and the arrows next to the line
-				numbers fold blocks of code. What <kbd>Tab</kbd> inserts comes from the code itself: tabs if it's indented
-				with tabs, otherwise spaces. <code>indent="tab"</code> or <code>indent="4"</code> sets it explicitly.</p>
+				numbers fold blocks of code. In HTML and XML, typing the <code>&gt;</code> of an opening tag adds its
+				closing tag: <code>&lt;div&gt;</code> becomes <code>&lt;div&gt;|&lt;/div&gt;</code>, except for tags that
+				never close, like <code>&lt;br&gt;</code> and <code>&lt;img&gt;</code>.</p>
+			<p><kbd>Tab</kbd> inserts a tab (shown 4 characters wide), unless the code is already indented with spaces: then
+				it inserts the same number of spaces. <code>indent="tab"</code> or <code>indent="4"</code> sets it
+				explicitly.</p>
 			<p>Try it here: click on <code>price</code>, press <kbd>Ctrl</kbd>+<kbd>D</kbd> three times, and type a new
 				name. Or hold <kbd>Alt</kbd> and drag down across the start of the lines.</p>
 			<div class="example">
@@ -833,7 +826,7 @@
 					</thead>
 					<tbody>
 						<tr><td>Edit the code</td><td>No</td><td>No</td></tr>
-						<tr><td>Select, copy, search</td><td>Yes</td><td>No</td></tr>
+						<tr><td>Select and copy</td><td>Yes</td><td>No</td></tr>
 						<tr><td>Reach it with <kbd>Tab</kbd></td><td>Yes (<kbd>Tab</kbd> then moves on, it doesn't indent)
 							</td><td>No</td></tr>
 						<tr><td>Sent with the form</td><td>Yes</td><td>No</td></tr>
@@ -951,7 +944,7 @@
 					<tbody>
 						<tr><td><code>json</code></td><td>Standard compact JSON: <code>{"a":1,"b":[1,2]}</code>. Invalid JSON
 								is stripped the same way, never rewritten.</td></tr>
-						<tr><td><code>javascript</code>, <code>typescript</code>, <code>jsx</code>, <code>tsx</code></td>
+						<tr><td><code>javascript</code></td>
 							<td>No whitespace or comments. A line break stays where removing it could change what the code
 								does, for example between statements without semicolons.</td></tr>
 						<tr><td><code>css</code></td><td>No whitespace or comments, except spaces that matter
@@ -1146,29 +1139,6 @@ export function total(items, taxRate = 0.16) {
   if (subtotal === 0) return 0
   return Math.round(subtotal * (1 + taxRate) * 100) / 100
 }`,
-				typescript: `interface Item {
-  sku: string
-  price: number
-  qty: number
-}
-
-export function total(items: Item[], taxRate = 0.16): number {
-  return items.reduce((sum, item) => sum + item.price * item.qty, 0) * (1 + taxRate)
-}`,
-				jsx: `export function Cart({ items }) {
-  return (
-    <ul className="cart">
-      {items.map((item) => (
-        <li key={item.sku}>{item.name}</li>
-      ))}
-    </ul>
-  )
-}`,
-				tsx: `type Props = { items: { sku: string; name: string }[] }
-
-export function Cart({ items }: Props) {
-  return <ul className="cart">{items.map((item) => <li key={item.sku}>{item.name}</li>)}</ul>
-}`,
 				html: `<!-- Order form -->
 <form action="/orders" method="post">
   <label for="qty">Quantity</label>
@@ -1254,7 +1224,7 @@ async function buy(sku, qty = 1) {
   "coupon": null
 }`],
 			]
-			for (const theme of ['light', 'intellij-dark', 'vscode-dark']) {
+			for (const theme of ['light', 'intellij-dark']) {
 				const title = document.createElement('h3')
 				title.innerHTML = `<code>theme="${theme}"</code>`
 				const row = document.createElement('div')

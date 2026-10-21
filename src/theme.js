@@ -13,6 +13,9 @@ const COMMON = {
 
 // Values of the `theme` attribute. Without it, the editor uses `light`, or
 // `intellij-dark` when the operating system is in dark mode.
+//
+// `active-line` must stay see-through: the selection is drawn behind the text,
+// so a solid line background would hide it on the line with the cursor.
 const THEMES = {
 	light: {
 		scheme: 'light',
@@ -68,7 +71,7 @@ const THEMES = {
 			'gutter-border': 'transparent',
 			border: '#4e5157',
 			'panel-bg': '#2b2d30',
-			'active-line': '#26282e',
+			'active-line': 'rgba(110, 121, 154, 0.1)', // #26282e over the background
 			selection: '#214283',
 			cursor: '#ced0d6',
 			focus: '#3574f0',
@@ -96,49 +99,6 @@ const THEMES = {
 			attribute: '#bcbec4',
 			meta: '#b3ae60',
 			invalid: '#f75464',
-		},
-	},
-
-	// VS Code's default "Dark Modern" theme, whose syntax colors come from Dark+.
-	'vscode-dark': {
-		scheme: 'dark',
-		colors: {
-			bg: '#1f1f1f',
-			fg: '#cccccc',
-			muted: '#6e7681',
-			'gutter-bg': '#1f1f1f',
-			'gutter-active': '#cccccc',
-			'gutter-border': 'transparent',
-			border: '#3c3c3c',
-			'panel-bg': '#202020',
-			'active-line': '#282828',
-			selection: '#264f78',
-			cursor: '#aeafad',
-			focus: '#0078d4',
-			'focus-ring': 'rgba(0, 120, 212, 0.35)',
-			match: 'rgba(173, 214, 255, 0.15)',
-			search: 'rgba(234, 92, 0, 0.33)',
-			'search-current': '#9e6a03',
-			bracket: 'rgba(0, 100, 0, 0.1)',
-			'bracket-border': '#888888',
-			keyword: '#569cd6',
-			control: '#c586c0',
-			constant: '#569cd6',
-			string: '#ce9178',
-			regexp: '#d16969',
-			escape: '#d7ba7d',
-			number: '#b5cea8',
-			comment: '#6a9955',
-			'comment-style': 'normal',
-			variable: '#9cdcfe',
-			property: '#9cdcfe',
-			function: '#dcdcaa',
-			type: '#4ec9b0',
-			tag: '#569cd6',
-			'tag-bracket': '#808080',
-			attribute: '#9cdcfe',
-			meta: '#569cd6',
-			invalid: '#f44747',
 		},
 	},
 }

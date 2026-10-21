@@ -73,7 +73,7 @@ export function dedent(text) {
 
 /**
  * Guesses the indent unit from the code: a tab, or the smallest space
- * indentation in use (2 when the code has no indented lines).
+ * indentation in use (a tab when the code has no indented lines).
  */
 export function detectIndent(text) {
 	let tabs = 0
@@ -87,5 +87,5 @@ export function detectIndent(text) {
 		}
 	}
 	if (tabs > spaced) return '\t'
-	return spaced ? ' '.repeat(Math.min(smallest, 8)) : '  '
+	return spaced ? ' '.repeat(Math.min(smallest, 8)) : '\t'
 }

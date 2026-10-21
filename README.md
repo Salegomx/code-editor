@@ -125,13 +125,13 @@ code-editor:not(:defined) { display: block; white-space: pre; font-family: monos
 | `name` | `name="payload"` | Field name used when the form is submitted. |
 | `id` | `id="payload"` | Usual HTML id. Used as the field name when there's no `name`. |
 | `language` | `language="json"` | Syntax highlighting. See [Languages](#languages). Defaults to plain text. |
-| `readonly` | `readonly` | Can't be edited, but can be focused, selected, searched and copied. **Is** submitted. Use it for documentation. |
+| `readonly` | `readonly` | Can't be edited, but can be focused, selected and copied. **Is** submitted. Use it for documentation. |
 | `disabled` | `disabled` | Greyed out, can't be focused, **not** submitted. A disabled `<fieldset>` around the editor has the same effect. |
 | `minify` | `minify` | Submits the code without layout whitespace and comments. See [minify](#minify). Off when absent. |
 | `width` | `width="600"`, `width="50%"` | Width. Plain numbers are pixels. Defaults to the full width of the container. |
 | `height` | `height="300"`, `height="40vh"` | Fixed height, with scrolling inside. Without it, the editor grows with its content. Use `style="max-height: 400px"` to cap the growth. |
-| `indent` | `indent="tab"`, `indent="4"` | What Tab inserts. Without it, the editor detects it from the code (tabs, or the smallest space indent; 2 spaces if unsure). |
-| `theme` | `theme="vscode-dark"` | `light`, `intellij-dark` (alias `dark`) or `vscode-dark`. Without it, the editor uses `light`, or `intellij-dark` when the operating system is in dark mode. See [Theming](#theming). |
+| `indent` | `indent="tab"`, `indent="4"` | What Tab inserts. Without it: a tab (shown 4 characters wide), unless the code is already indented with spaces, in which case it uses the same number of spaces. |
+| `theme` | `theme="intellij-dark"` | `light` or `intellij-dark` (alias `dark`). Without it, the editor uses `light`, or `intellij-dark` when the operating system is in dark mode. See [Theming](#theming). |
 | `style` | `style="border-radius: 0"` | Styles the outer box. |
 | `form` | `form="order-form"` | Belongs to that form even when placed outside it, like any form field. |
 | `aria-label` | `aria-label="Request body"` | Accessible name. A `<label for="id">` works too. |
@@ -207,7 +207,7 @@ What's never changed: the contents of strings, template literals, regular expres
 | Language | Result |
 | --- | --- |
 | `json` | Standard compact JSON: `{"a":1,"b":[1,2]}`. Invalid JSON is stripped the same way, never rewritten. |
-| `javascript`, `typescript`, `jsx`, `tsx` | Whitespace and comments removed. A line break is kept where removing it could change the meaning, for example between statements without semicolons. |
+| `javascript` | Whitespace and comments removed. A line break is kept where removing it could change the meaning, for example between statements without semicolons. |
 | `css`, and CSS in an HTML `<style>` block | Whitespace and comments removed, except spaces that matter (`.a .b`, `calc(1px + 2px)`, `and (min-width…)`). |
 | `html`, `xml` | Whitespace between tags removed, whitespace in text collapsed to one space, comments removed. Note: this also collapses text inside `<pre>`. Code inside `<script>` and `<style>` follows the JavaScript and CSS rules. |
 | `text` | Every run of whitespace becomes one space. |
@@ -222,13 +222,12 @@ Pick a theme with the `theme` attribute:
 | *(none)* or `auto` | `light`, or `intellij-dark` when the operating system is in dark mode |
 | `light` | Light, GitHub-style colors |
 | `intellij-dark` or `dark` | IntelliJ IDEA's default dark editor scheme ("Dark", New UI) |
-| `vscode-dark` | VS Code's default dark theme ("Dark Modern", with Dark+ syntax colors) |
 
 ```html
-<code-editor language="json" theme="vscode-dark" readonly>…</code-editor>
+<code-editor language="json" theme="intellij-dark" readonly>…</code-editor>
 ```
 
-The IntelliJ and VS Code colors are taken from those editors' own theme files. The editor's syntax parser isn't the same as theirs, so a few tokens can still be colored differently, for example CSS values and constants declared with `const`. Dark themes also switch the scrollbars to dark. An unknown theme name falls back to `light` and logs a warning in the console.
+The IntelliJ colors are taken from IntelliJ's own color scheme file. The editor's syntax parser isn't the same as IntelliJ's, so a few tokens can still be colored differently, for example some CSS values. Dark themes also switch the scrollbars to dark. An unknown theme name falls back to `light` and logs a warning in the console.
 
 To add a theme, add an entry to `THEMES` in [src/theme.js](src/theme.js). Every theme sets the same list of colors.
 
@@ -246,17 +245,17 @@ code-editor {
 | --- | --- |
 | `--code-editor-font`, `--code-editor-font-size`, `--code-editor-line-height` | Text |
 | `--code-editor-radius`, `--code-editor-border` | Outer box |
-| `--code-editor-bg`, `--code-editor-fg`, `--code-editor-panel-bg` | Background, text, search panel and tooltips |
+| `--code-editor-bg`, `--code-editor-fg`, `--code-editor-panel-bg` | Background, text, folded-code marker |
 | `--code-editor-gutter-bg`, `--code-editor-gutter-border`, `--code-editor-muted`, `--code-editor-gutter-active` | Line-number gutter: background, divider, numbers, current line's number |
 | `--code-editor-active-line`, `--code-editor-selection`, `--code-editor-cursor` | Editing |
 | `--code-editor-focus`, `--code-editor-focus-ring` | Focus outline |
 | `--code-editor-match` | Other occurrences of the selected text |
-| `--code-editor-search`, `--code-editor-search-current` | Search results, current search result |
+| `--code-editor-search`, `--code-editor-search-current` | Search results, current search result (only used if the search panel is turned back on) |
 | `--code-editor-bracket`, `--code-editor-bracket-border` | Matching bracket |
 | `--code-editor-keyword`, `-control`, `-constant`, `-string`, `-regexp`, `-escape`, `-number`, `-comment`, `-variable`, `-property`, `-function`, `-type`, `-tag`, `-tag-bracket`, `-attribute`, `-meta`, `-invalid` | Syntax colors. `control` is `if`/`return`/`import`; `constant` is `true`/`false`/`null`; `meta` is decorators and `<?xml ?>`. |
 | `--code-editor-comment-style` | `italic` or `normal` |
 
-A variable you set overrides that color in every theme. To change one theme only, target it: `code-editor[theme="vscode-dark"] { --code-editor-bg: #181818; }`. The editor area is also exposed as `code-editor::part(editor)`.
+A variable you set overrides that color in every theme. To change one theme only, target it: `code-editor[theme="intellij-dark"] { --code-editor-bg: #2b2b2b; }`. The editor area is also exposed as `code-editor::part(editor)`.
 
 ## Keyboard
 
@@ -273,11 +272,13 @@ A variable you set overrides that color in every theme. To change one theme only
 | Shift+Alt+↑ / ↓ | Copy line up / down |
 | Ctrl+/ | Toggle comment |
 | Ctrl+] / Ctrl+[ | Indent / outdent line |
-| Ctrl+F | Find and replace (one panel). F3 / Shift+F3: next / previous match. |
-| Ctrl+Alt+G | Go to line |
 | Ctrl+Z, Ctrl+Y or Ctrl+Shift+Z | Undo, redo |
 
 In `readonly` editors, Tab moves focus as on any other field.
+
+Brackets and quotes close themselves. In HTML and XML, typing the `>` of an opening tag adds its closing tag (`<div>` becomes `<div>|</div>`), except for void elements such as `<br>` and `<img>` and self-closing tags such as `<item/>`. This is [src/close-tags.js](src/close-tags.js); there's no autocomplete pop-up.
+
+**The search panel (Ctrl+F, F3, Ctrl+Alt+G) is turned off** to keep the file smaller. To bring it back, uncomment `searchKeymap` in the import and in the keymap in [src/code-editor.js](src/code-editor.js).
 
 ## Languages
 
@@ -286,14 +287,14 @@ In `readonly` editors, Tab moves focus as on any other field.
 | `text` (default) | `plain`, `plaintext`, `txt` |
 | `json` | |
 | `javascript` | `js` |
-| `typescript` | `ts` |
-| `jsx`, `tsx` | |
 | `html` | `htm` |
 | `css` | |
 | `xml` | `svg` |
 | `shell` | `bash`, `sh` |
 
-**Turned off for now:** `sql`. Its code is commented out in [src/languages.js](src/languages.js), and its package is still installed. To turn it back on, uncomment its three lines in `src/languages.js` (the import, the `sql` entry and its minify rules). Then remove `.skip` from the SQL test in [test/minify.test.js](test/minify.test.js) and add `sql` to the table above. This adds about 12 KB gzipped.
+**Turned off for now:** `sql`. Its code is commented out in [src/languages.js](src/languages.js), and its package is still installed. To turn it back on, uncomment its three lines in `src/languages.js` (the import, the `sql` entry and its minify rules). Then remove `.skip` from the SQL test in [test/minify.test.js](test/minify.test.js) and add `sql` to the table above. This adds about 10 KB gzipped.
+
+The languages are used bare (for example `htmlLanguage`, not `html()`), because the `html()`, `css()` and similar helpers only add autocomplete lists. HTML still highlights the JavaScript and CSS in its `<script>` and `<style>` blocks.
 
 To add a language: install its CodeMirror package with pnpm (for example `pnpm add @codemirror/lang-python`), register it in [src/languages.js](src/languages.js), give it minify rules in [src/minify.js](src/minify.js), add a test in [test/minify.test.js](test/minify.test.js), and update the table above. Every language adds to the bundle size.
 
@@ -301,7 +302,7 @@ To add a language: install its CodeMirror package with pnpm (for example `pnpm a
 
 - Works in current Chrome, Edge, Firefox and Safari: Chrome/Edge 102+, Firefox 112+, Safari 16.4+. It isn't meant for Internet Explorer.
 - Automated tests run in Chrome. Check Firefox and Safari by hand when changing editor behavior.
-- `dist/code-editor.js` is about 580 KB minified, **about 203 KB gzipped**. Most of that is CodeMirror's editing core; the languages are roughly a quarter.
+- `dist/code-editor.js` is about 500 KB minified, **about 171 KB gzipped** (146 KB with Brotli). Most of that is CodeMirror's editing core. The biggest single part is the JavaScript grammar, which HTML needs for `<script>` blocks.
 
 ## Project layout
 
@@ -309,6 +310,7 @@ To add a language: install its CodeMirror package with pnpm (for example `pnpm a
 src/index.js         registers the <code-editor> element
 src/code-editor.js   the element: attributes, form integration, events
 src/content.js       reads and dedents the code pasted between the tags
+src/close-tags.js    closes HTML/XML tags as you type
 src/languages.js     the `language` values and their minify rules
 src/minify.js        the minify logic
 src/theme.js         colors, fonts and CSS variables
